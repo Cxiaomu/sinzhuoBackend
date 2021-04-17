@@ -12,12 +12,24 @@ var courseRouter = require('./routes/course');
 
 var app = express();
 
+app.all('*', function(req, res, next) {
+  //设为指定的域
+  res.header('Access-Control-Allow-Origin', "*");
+  res.header("Access-Control-Allow-Headers", "X-Requested-With");
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
+  res.header('Access-Control-Allow-Credentials', true);
+  res.header("X-Powered-By", ' 3.2.1');
+  next();
+});
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
 app.use(logger('dev'));
 app.use(express.json());
+// { extended: false }
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));

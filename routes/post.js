@@ -13,7 +13,7 @@ router.get('/', function(req, res, next) {
   }
 
   dbconfig.query(sql, sqlArr, callBack);
-  res.send('respond with a resource');
+  //  res.send('respond with a resource');
 });
 
 module.exports = router;
