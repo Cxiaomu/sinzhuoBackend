@@ -68,6 +68,7 @@ router.get('/projectDetail', function (req, res, next) {
       res.send(data)
       return
     }
+    data[0]['time'] = data[0]['p_time']
     // 处理项目阶段、项目领域
     projectList.phaseList.forEach((item) => {
       if (item.id == data[0]['phase']) {
@@ -93,4 +94,73 @@ router.get('/projectDetail', function (req, res, next) {
   }
   dbconfig.query(sql, sqlArr, callBack);
 });
+
+
+// 新建项目
+router.post('/createProject', function (req, res, next) {
+  let {
+    userId,
+    name,
+    imgUrl,
+    field,
+    phase,
+    financing,
+    abstract
+  } = req.body
+  console.log(req.body)
+  let sql = `insert into projectInfo(userId, name, imgUrl, field, phase, financing,  abstract) 
+  values(${userId}, '${name}', '${imgUrl}', ${field}, ${phase}, ${financing}, '${abstract}')`;
+  let sqlArr = [];
+  let callBack = (data) => {
+    console.log(data);
+    if (data.affectedRows === 1) {
+      res.send(JSON.stringify({ success: true}))
+    }
+    res.send(JSON.stringify(data))
+  }
+  dbconfig.query(sql, sqlArr, callBack);
+});
+
+
+// 更新项目
+router.post('/updateProject', function (req, res, next) {
+  let {
+    projectId,
+    imgUrl,
+    phase,
+    financing,
+    abstract,
+    userId
+  } = req.body
+  console.log(req.body)
+  let sql = `update projectInfo set imgUrl='${imgUrl}', phase=${phase}, financing=${financing}, abstract='${abstract}'
+  where userId=${userId} AND id=${projectId}`;
+  let sqlArr = [];
+  let callBack = (data) => {
+    console.log(data);
+    if (data.affectedRows === 1) {
+      res.send(JSON.stringify({ success: true}))
+    }
+  }
+  dbconfig.query(sql, sqlArr, callBack);
+});
+
+
+// 删除项目
+router.get('/delProject', function (req, res, next) {
+  let projectId = req.query.projectId
+  console.log(req.query)
+  let sql = `delete from projectInfo where id=${projectId}`;
+  let sqlArr = [];
+  let callBack = (data) => {
+    console.log(data);
+    if (data.affectedRows === 1) {
+      res.send(JSON.stringify({ success: true}))
+    }
+    res.send(JSON.stringify(data))
+  }
+  dbconfig.query(sql, sqlArr, callBack);
+});
+
+
 module.exports = router;
