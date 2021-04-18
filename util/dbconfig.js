@@ -30,8 +30,9 @@ module.exports = {
         }
         
         // 执行回调函数
-        callback && callback(JSON.parse(JSON.stringify(data)),
-          JSON.parse(JSON.stringify(fields)));
+        // console.log(data)
+        // console.log(fields)
+        callback && callback(JSON.parse(JSON.stringify(data)));
 
         // 关闭数据库
         conn.end((err) => {
