@@ -66,4 +66,71 @@ router.get('/courseDetail', function (req, res, next) {
   }
   dbconfig.query(sql, sqlArr, callBack);
 });
+
+// 新建课程
+router.post('/createCourse', function (req, res, next) {
+  let {
+    userId,
+    name,
+    author,
+    uint,
+    link,
+    abstract
+  } = req.body
+  console.log(req.body)
+  let sql = `insert into courseInfo(userId, name, author, unit, link,  abstract) 
+  values(${userId}, '${name}', '${author}', '${uint}', '${link}', '${abstract}')`;
+  let sqlArr = [];
+  let callBack = (data) => {
+    console.log(data);
+    let resData = { success: false }
+    if (data.affectedRows === 1) {
+      resData.success = true
+    } 
+    res.send(JSON.stringify(resData))
+  }
+  dbconfig.query(sql, sqlArr, callBack);
+});
+
+
+// 更新课程
+router.post('/updateCourse', function (req, res, next) {
+  let {
+    courseId,
+    userId,
+    link,
+    abstract
+  } = req.body
+  console.log(req.body)
+  let sql = `update courseInfo set link='${link}', abstract='${abstract}'
+  where userId=${userId} AND id=${courseId}`;
+  let sqlArr = [];
+  let callBack = (data) => {
+    let resData = { success: false }
+    if (data.affectedRows === 1) {
+      resData.success = true
+    } 
+    res.send(JSON.stringify(resData))
+  }
+  dbconfig.query(sql, sqlArr, callBack);
+});
+
+
+// 删除课程
+router.get('/delCourse', function (req, res, next) {
+  let courseId = req.query.courseId
+  console.log(req.query)
+  let sql = `delete from courseInfo where id=${courseId}`;
+  let sqlArr = [];
+  let callBack = (data) => {
+    let resData = { success: false }
+    if (data.affectedRows === 1) {
+      resData.success = true
+    } 
+    res.send(JSON.stringify(resData))
+  }
+  dbconfig.query(sql, sqlArr, callBack);
+});
+
+
 module.exports = router;

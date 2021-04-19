@@ -70,4 +70,86 @@ router.get('/postDetail', function (req, res, next) {
   }
   dbconfig.query(sql, sqlArr, callBack);
 });
+
+// 新建岗位
+router.post('/createPost', function (req, res, next) {
+  let {
+    userId,
+    name,
+    unit,
+    price,
+    education,
+    experience,
+    need,
+    duty,
+    require,
+    address
+  } = req.body
+  console.log(req.body)
+  let sql = `insert into postInfo(userId, name, unit,
+    price_low, price_high, education, experience, need_low, need_high, duty, must, address) 
+    values(${userId}, '${name}', '${unit}', ${price[0]}, ${price[1]}, '${education}',
+    '${experience}', ${need[0]}, ${need[1]}, '${duty}', '${require}', '${address}')`;
+  let sqlArr = [];
+  let callBack = (data) => {
+    console.log(data);
+    let resData = { success: false, id: 0 }
+    if (data.affectedRows === 1) {
+      resData.success = true
+      resData.id = data.insertId
+    } 
+    res.send(JSON.stringify(resData))
+  }
+  dbconfig.query(sql, sqlArr, callBack);
+});
+
+
+// 更新项目
+router.post('/updatePost', function (req, res, next) {
+  let {
+    postId,
+    userId,
+    price,
+    education,
+    experience,
+    need,
+    duty,
+    require,
+    address
+  } = req.body
+  console.log(req.body)
+  let sql = `update postInfo set price_low=${price[0]}, price_high=${price[1]}, education='${education}',
+    experience='${experience}', need_low=${need[0]}, need_high=${need[1]}, duty='${duty}', must='${require}', address='${address}'
+    where userId=${userId} AND id=${postId}`;
+  let sqlArr = [];
+  let callBack = (data) => {
+    console.log(data);
+    let resData = { success: false }
+    if (data.affectedRows === 1) {
+      resData.success = true
+    } 
+    res.send(JSON.stringify(resData))
+  }
+  dbconfig.query(sql, sqlArr, callBack);
+});
+
+
+// 删除项目
+router.get('/delPost', function (req, res, next) {
+  let postId = req.query.postId
+  console.log(req.query)
+  let sql = `delete from postInfo where id=${postId}`;
+  let sqlArr = [];
+  let callBack = (data) => {
+    console.log(data);
+    let resData = { success: false }
+    if (data.affectedRows === 1) {
+      resData.success = true
+    } 
+    res.send(JSON.stringify(resData))
+  }
+  dbconfig.query(sql, sqlArr, callBack);
+});
+
+
 module.exports = router;

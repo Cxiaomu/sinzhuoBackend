@@ -113,10 +113,11 @@ router.post('/createProject', function (req, res, next) {
   let sqlArr = [];
   let callBack = (data) => {
     console.log(data);
+    let resData = { success: false }
     if (data.affectedRows === 1) {
-      res.send(JSON.stringify({ success: true}))
-    }
-    res.send(JSON.stringify(data))
+      resData.success = true
+    } 
+    res.send(JSON.stringify(resData))
   }
   dbconfig.query(sql, sqlArr, callBack);
 });
@@ -137,10 +138,11 @@ router.post('/updateProject', function (req, res, next) {
   where userId=${userId} AND id=${projectId}`;
   let sqlArr = [];
   let callBack = (data) => {
-    console.log(data);
+    let resData = { success: false }
     if (data.affectedRows === 1) {
-      res.send(JSON.stringify({ success: true}))
-    }
+      resData.success = true
+    } 
+    res.send(JSON.stringify(resData))
   }
   dbconfig.query(sql, sqlArr, callBack);
 });
@@ -153,11 +155,11 @@ router.get('/delProject', function (req, res, next) {
   let sql = `delete from projectInfo where id=${projectId}`;
   let sqlArr = [];
   let callBack = (data) => {
-    console.log(data);
+    let resData = { success: false }
     if (data.affectedRows === 1) {
-      res.send(JSON.stringify({ success: true}))
-    }
-    res.send(JSON.stringify(data))
+      resData.success = true
+    } 
+    res.send(JSON.stringify(resData))
   }
   dbconfig.query(sql, sqlArr, callBack);
 });
