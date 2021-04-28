@@ -3,17 +3,33 @@ const dbconfig = require('../util/dbconfig');
 var router = express.Router();
 
 /* GET course listing. */
-router.get('/', function(req, res, next) {
-  let sql = "select * from userInfo";
+// 根据页数、当前页获取课程列表
+router.get('/filter', function (req, res) {
+  let {
+    pageSize,
+    nowPage
+  } = req.query
+  let sql = `select id, name, view, abstract from courseinfo limit ${nowPage}, ${pageSize}`;
   let sqlArr = [];
-  let callBack =  (data, fields) => {
+  let callBack = (data) => {
     console.log(data);
-    res.send(data)
-    // console.log(fields);
+    res.send(JSON.stringify(data))
   }
-
   dbconfig.query(sql, sqlArr, callBack);
-  // res.send('respond with a resource');
+});
+
+// 课程总数
+router.get('/courseTotal', function(req, res, next) {
+  let sql = "select * from courseinfo";
+  let sqlArr = [];
+  let callBack = (data) => {
+    let resData = {
+      total: data.length
+    }
+    console.log(data, "data")
+    res.send(JSON.stringify(resData))
+  }
+  dbconfig.query(sql, sqlArr, callBack);
 });
 
 
@@ -21,7 +37,7 @@ router.get('/', function(req, res, next) {
 router.get('/courseOwn', function (req, res, next) {
   let userId = req.query.userId
   console.log(req.query)
-  let sql = `select id, name, author,unit,link,c_time from courseInfo where userId=${userId}`;
+  let sql = `select id, name, author,unit,link,c_time from courseinfo where userId=${userId}`;
   let sqlArr = [];
   let callBack = (data) => {
     console.log(data);
@@ -41,7 +57,7 @@ router.get('/courseOwn', function (req, res, next) {
 router.get('/courseDetail', function (req, res, next) {
   let courseId = req.query.courseId;
   console.log(req.query)
-  let sql = `select * from courseInfo where id=${courseId}`;
+  let sql = `select * from courseinfo where id=${courseId}`;
   let sqlArr = [];
   let callBack = (data) => {
     console.log(data)
@@ -78,7 +94,7 @@ router.post('/createCourse', function (req, res, next) {
     abstract
   } = req.body
   console.log(req.body)
-  let sql = `insert into courseInfo(userId, name, author, unit, link,  abstract) 
+  let sql = `insert into courseinfo(userId, name, author, unit, link,  abstract) 
   values(${userId}, '${name}', '${author}', '${uint}', '${link}', '${abstract}')`;
   let sqlArr = [];
   let callBack = (data) => {
@@ -102,7 +118,7 @@ router.post('/updateCourse', function (req, res, next) {
     abstract
   } = req.body
   console.log(req.body)
-  let sql = `update courseInfo set link='${link}', abstract='${abstract}'
+  let sql = `update courseinfo set link='${link}', abstract='${abstract}'
   where userId=${userId} AND id=${courseId}`;
   let sqlArr = [];
   let callBack = (data) => {
@@ -120,7 +136,7 @@ router.post('/updateCourse', function (req, res, next) {
 router.get('/delCourse', function (req, res, next) {
   let courseId = req.query.courseId
   console.log(req.query)
-  let sql = `delete from courseInfo where id=${courseId}`;
+  let sql = `delete from courseinfo where id=${courseId}`;
   let sqlArr = [];
   let callBack = (data) => {
     let resData = { success: false }

@@ -70,7 +70,7 @@ router.post('/register', function (req, res, next) {
 router.get('/uerInfo', function (req, res, next) {
   let userId = req.query.userId;
   console.log(req.query)
-  let sql = `select * from postInfo where id=${userId}`;
+  let sql = `select * from userInfo where id=${userId}`;
   let sqlArr = [];
   let callBack = (data) => {
     console.log(data)

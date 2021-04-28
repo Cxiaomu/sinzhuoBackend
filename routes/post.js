@@ -4,25 +4,45 @@ var router = express.Router();
 
 /* GET post listing. */
 // 根据页数、当前页获取岗位列表
-router.get('/', function (req, res, next) {
-  let sql = "select * from userInfo";
+router.get('/filter', function (req, res) {
+  let {
+    pageSize,
+    nowPage
+  } = req.query
+  let sql = `select * from postinfo limit ${nowPage}, ${pageSize}`;
   let sqlArr = [];
   let callBack = (data) => {
     console.log(data);
-    res.send(data)
-    // console.log(fields);
+    if (data.length > 0) {
+      data.forEach((item) => {
+        item['price'] = [item['price_low'], item['price_high']]
+        item['need'] = [item['need_low'], item['need_high']]
+      })
+    }
+    res.send(JSON.stringify(data))
   }
-
   dbconfig.query(sql, sqlArr, callBack);
-  //  res.send('respond with a resource');
 });
 
+// 岗位总数
+router.get('/postTotal', function (req, res) {
+  let sql = "select * from postinfo";
+  let sqlArr = [];
+  let callBack = (data) => {
+    let resData = {
+      total: data.length
+    }
+    console.log(data, "data")
+    res.send(JSON.stringify(resData))
+  }
+  dbconfig.query(sql, sqlArr, callBack);
+})
 
 // 获取我的岗位
 router.get('/postOwn', function (req, res, next) {
   let userId = req.query.userId
   console.log(req.query)
-  let sql = `select * from postInfo where userId=${userId}`;
+  let sql = `select * from postinfo where userId=${userId}`;
   let sqlArr = [];
   let callBack = (data) => {
     console.log(data);
@@ -42,7 +62,7 @@ router.get('/postOwn', function (req, res, next) {
 router.get('/postDetail', function (req, res, next) {
   let postId = req.query.postId;
   console.log(req.query)
-  let sql = `select * from postInfo where id=${postId}`;
+  let sql = `select * from postinfo where id=${postId}`;
   let sqlArr = [];
   let callBack = (data) => {
     console.log(data)
@@ -86,18 +106,21 @@ router.post('/createPost', function (req, res, next) {
     address
   } = req.body
   console.log(req.body)
-  let sql = `insert into postInfo(userId, name, unit,
+  let sql = `insert into postinfo(userId, name, unit,
     price_low, price_high, education, experience, need_low, need_high, duty, must, address) 
     values(${userId}, '${name}', '${unit}', ${price[0]}, ${price[1]}, '${education}',
     '${experience}', ${need[0]}, ${need[1]}, '${duty}', '${require}', '${address}')`;
   let sqlArr = [];
   let callBack = (data) => {
     console.log(data);
-    let resData = { success: false, id: 0 }
+    let resData = {
+      success: false,
+      id: 0
+    }
     if (data.affectedRows === 1) {
       resData.success = true
       resData.id = data.insertId
-    } 
+    }
     res.send(JSON.stringify(resData))
   }
   dbconfig.query(sql, sqlArr, callBack);
@@ -118,16 +141,18 @@ router.post('/updatePost', function (req, res, next) {
     address
   } = req.body
   console.log(req.body)
-  let sql = `update postInfo set price_low=${price[0]}, price_high=${price[1]}, education='${education}',
+  let sql = `update postinfo set price_low=${price[0]}, price_high=${price[1]}, education='${education}',
     experience='${experience}', need_low=${need[0]}, need_high=${need[1]}, duty='${duty}', must='${require}', address='${address}'
     where userId=${userId} AND id=${postId}`;
   let sqlArr = [];
   let callBack = (data) => {
     console.log(data);
-    let resData = { success: false }
+    let resData = {
+      success: false
+    }
     if (data.affectedRows === 1) {
       resData.success = true
-    } 
+    }
     res.send(JSON.stringify(resData))
   }
   dbconfig.query(sql, sqlArr, callBack);
@@ -138,14 +163,16 @@ router.post('/updatePost', function (req, res, next) {
 router.get('/delPost', function (req, res, next) {
   let postId = req.query.postId
   console.log(req.query)
-  let sql = `delete from postInfo where id=${postId}`;
+  let sql = `delete from postinfo where id=${postId}`;
   let sqlArr = [];
   let callBack = (data) => {
     console.log(data);
-    let resData = { success: false }
+    let resData = {
+      success: false
+    }
     if (data.affectedRows === 1) {
       resData.success = true
-    } 
+    }
     res.send(JSON.stringify(resData))
   }
   dbconfig.query(sql, sqlArr, callBack);

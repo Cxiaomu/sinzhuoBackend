@@ -1,19 +1,25 @@
 var express = require('express');
+const multer = require('multer'); // 处理上传图片
+const path = require('path');
 const dbconfig = require('../util/dbconfig');
 var router = express.Router();
 const projectList = require('../public/json/project.json')
 
 /* GET project listing. */
 // 获取项目列表
-router.get('/allProject', function (req, res, next) {
-  let {
+router.get('/projectList', function (req, res, next) {
+  let params = {
     financing,
     phase,
     field,
     pageSize,
     nowPage
   } = req.query
+  let sql = "select * from userInfo where "
   console.log(req.query)
+  for (let key in params) {
+    // if (params[key] != null)
+  }
   // let sql = "select * from userInfo";
   // let sqlArr = [];
   // let callBack =  (data) => {
@@ -164,5 +170,40 @@ router.get('/delProject', function (req, res, next) {
   dbconfig.query(sql, sqlArr, callBack);
 });
 
+// 图片存储配置
+var storage = multer.diskStorage({
+  // 配置文件上传后存储的路径
+  destination: function (req, file, cb) {
+      cb(null, path.join(__dirname,'../public/images/uploads'))
+  },
+  // 配置文件上传后存储的路径和文件名
+  filename: function (req, file, cb) {
+      console.log('file',file);
+      cb(null, Date.now() + path.extname(file.originalname))
+  }
+})
+var upload = multer({ storage: storage })
+
+
+// 上传项目logo
+router.post('/projectLogo', upload.single("file"), function (req, res) {
+  let imgUrl = req.file.filename;
+  console.log(req.file)
+  let data = [
+      {
+        name: req.file.originalname,
+        url: "http://localhost:3000/project/projectImg?imgName="+ req.file.filename
+      }
+  ]
+  
+  res.send(JSON.stringify(data))
+});
+
+// 读取图片
+router.get('/projectImg', function (req, res) {
+  let filename = req.query.imgName;
+  let url = path.join(__dirname,'../public/images/uploads/')
+  res.sendFile(url+filename)
+});
 
 module.exports = router;
