@@ -9,7 +9,7 @@ router.get('/filter', function (req, res) {
     pageSize,
     nowPage
   } = req.query
-  let sql = `select id, name, view, abstract from courseinfo limit ${nowPage}, ${pageSize}`;
+  let sql = `select id, name, view, abstract from courseinfo limit ${nowPage-1}, ${pageSize}`;
   let sqlArr = [];
   let callBack = (data) => {
     console.log(data);
