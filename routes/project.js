@@ -6,8 +6,20 @@ var router = express.Router();
 const projectList = require('../public/json/project.json')
 
 /* GET project listing. */
-// 获取项目列表
+// 获取前 6 条
+router.get('/top', function (req, res, next) {
+  // let sql = 'select top 6 id, name, imgUrl, abstract from projectinfo order by p_time desc';
+  // let sqlArr = [];
+  // let callBack = (data) => {
+  //   console.log(data);
+  //   res.send(data)
+  // }
+  // dbconfig.query(sql, sqlArr, callBack);
+  res.end("nodata")
+})
 
+
+// 获取项目列表
 router.get('/filter', function (req, res, next) {
   let {
     financing,
@@ -48,18 +60,19 @@ router.get('/filter', function (req, res, next) {
   }
 
   // let sql = `select * from projectinfo ${subSQL1+subSQL2+subSQL3} limit ${nowPage-1}, ${pageSize}`
-  let sql = `select * from projectinfo ${subSQL1+subSQL2+subSQL3} `
+  let sql = `select * from projectinfo ${subSQL1+subSQL2+subSQL3}`
   let sqlArr = [];
   let callBack =  (data) => {
     console.log(sql)
-    console.log(data)
+    // console.log(data)
     let result = {
       total: data.length,
-      list: {}
+      list: []
     }
     if (data.length > 0) {
-      let end = (nowPage+1)*pageSize+1 > data.length ? data.length:(nowPage+1)*pageSize+1
+      let end = (nowPage)*pageSize > data.length ? data.length:(nowPage)*pageSize
       result.list = data.slice([(nowPage-1)*pageSize], end);
+      console.log((nowPage-1)*pageSize, end)
       result.list.forEach((item) => {
         projectList.phaseList.forEach((phase) => {
           if (phase.id == item['phase']) {
@@ -77,7 +90,6 @@ router.get('/filter', function (req, res, next) {
   }
 
   dbconfig.query(sql, sqlArr, callBack);
-  // res.send('respond with a resource');
 });
 
 
@@ -113,7 +125,7 @@ router.get('/keywords', function (req, res, next) {
 router.get('/projectOwn', function (req, res, next) {
   let userId = req.query.userId
   console.log(req.query)
-  let sql = `select id, name, phase, field from projectinfo where userId=${userId}`;
+  let sql = `select id, name, phase, field, financing from projectinfo where userId=${userId}`;
   let sqlArr = [];
   let callBack = (data) => {
     console.log(data);
@@ -196,10 +208,12 @@ router.post('/createProject', function (req, res, next) {
   let callBack = (data) => {
     console.log(data);
     let resData = {
-      success: false
+      success: false,
+      id: 0
     }
     if (data.affectedRows === 1) {
       resData.success = true
+      resData.id =  data.insertId
     }
     res.send(JSON.stringify(resData))
   }

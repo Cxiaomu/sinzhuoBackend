@@ -9,7 +9,7 @@ router.get('/filter', function (req, res) {
     pageSize,
     nowPage
   } = req.query
-  let sql = `select * from postinfo limit ${nowPage-1}, ${pageSize}`;
+  let sql = `select * from postinfo limit ${(nowPage-1)*pageSize}, ${pageSize}`;
   let sqlArr = [];
   let callBack = (data) => {
     console.log(data);

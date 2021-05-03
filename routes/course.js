@@ -9,10 +9,11 @@ router.get('/filter', function (req, res) {
     pageSize,
     nowPage
   } = req.query
-  let sql = `select id, name, view, abstract from courseinfo limit ${nowPage-1}, ${pageSize}`;
+  let sql = `select id, name, author, abstract, unit from courseinfo limit ${(nowPage-1)*pageSize}, ${pageSize}`;
   let sqlArr = [];
   let callBack = (data) => {
-    console.log(data);
+    // console.log(data);
+    console.log(sql)
     res.send(JSON.stringify(data))
   }
   dbconfig.query(sql, sqlArr, callBack);
@@ -40,7 +41,7 @@ router.get('/courseOwn', function (req, res, next) {
   let sql = `select id, name, author,unit,link,c_time from courseinfo where userId=${userId}`;
   let sqlArr = [];
   let callBack = (data) => {
-    console.log(data);
+    // console.log(data);
     if (data.length > 0) {
       data.forEach((item) => {
         item['time'] = item['c_time']
@@ -89,19 +90,20 @@ router.post('/createCourse', function (req, res, next) {
     userId,
     name,
     author,
-    uint,
+    unit,
     link,
     abstract
   } = req.body
   console.log(req.body)
   let sql = `insert into courseinfo(userId, name, author, unit, link,  abstract) 
-  values(${userId}, '${name}', '${author}', '${uint}', '${link}', '${abstract}')`;
+  values(${userId}, '${name}', '${author}', '${unit}', '${link}', '${abstract}')`;
   let sqlArr = [];
   let callBack = (data) => {
     console.log(data);
-    let resData = { success: false }
+    let resData = { success: false, id: 0 }
     if (data.affectedRows === 1) {
       resData.success = true
+      resData.id =  data.insertId
     } 
     res.send(JSON.stringify(resData))
   }

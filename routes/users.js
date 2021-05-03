@@ -69,14 +69,16 @@ router.post('/register', function (req, res, next) {
 // 获取用户信息 根据id
 router.get('/uerInfo', function (req, res, next) {
   let userId = req.query.userId;
-  console.log(req.query)
-  let sql = `select * from userInfo where id=${userId}`;
-  let sqlArr = [];
-  let callBack = (data) => {
-    console.log(data)
-    res.send(data)
+  if (userId) {
+    console.log(req.query)
+    let sql = `select * from userInfo where id=${userId}`;
+    let sqlArr = [];
+    let callBack = (data) => {
+      console.log(data)
+      res.send(data)
+    }
+    dbconfig.query(sql, sqlArr, callBack);
   }
-  dbconfig.query(sql, sqlArr, callBack);
 });
 
 
@@ -127,7 +129,7 @@ router.post('/updatePwd', function (req, res, next) {
 // 更新个人信息
 router.post('/updateInfo', function (req, res, next) {
   let {
-    userId,
+    id,
     name,
     sex,
     unit,
@@ -138,10 +140,12 @@ router.post('/updateInfo', function (req, res, next) {
   } = req.body
   console.log(req.body)
   let sql = `update userInfo set name='${name}', sex='${sex}', unit='${unit}', department='${department}',
-   tel='${tel}', email='${email}', abstract='${abstract}' where id=${userId}`;
+   tel='${tel}', email='${email}', abstract='${abstract}' where id=${id}`;
   let sqlArr = [];
   let callBack = (data) => {
-    let resData = { success: false }
+    let resData = {
+      success: false
+    }
     if (data.affectedRows === 1) {
       resData.success = true
     }
