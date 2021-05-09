@@ -8,14 +8,13 @@ const projectList = require('../public/json/project.json')
 /* GET project listing. */
 // 获取前 6 条
 router.get('/top', function (req, res, next) {
-  // let sql = 'select top 6 id, name, imgUrl, abstract from projectinfo order by p_time desc';
-  // let sqlArr = [];
-  // let callBack = (data) => {
-  //   console.log(data);
-  //   res.send(data)
-  // }
-  // dbconfig.query(sql, sqlArr, callBack);
-  res.end("nodata")
+  let sql = 'select id, name, imgUrl, abstract from projectinfo order by p_time desc limit 0,6';
+  let sqlArr = [];
+  let callBack = (data) => {
+    console.log(data);
+    res.send(data)
+  }
+  dbconfig.query(sql, sqlArr, callBack);
 })
 
 
