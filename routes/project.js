@@ -31,7 +31,7 @@ router.get('/filter', function (req, res, next) {
   let subSQL1 = '';
   let subSQL2 = '';
   let subSQL3 = '';
-  
+
   // 是否融资
   if (financing == '1') { // 是
     subSQL1 = ` where financing=1 `
@@ -61,7 +61,7 @@ router.get('/filter', function (req, res, next) {
   // let sql = `select * from projectinfo ${subSQL1+subSQL2+subSQL3} limit ${nowPage-1}, ${pageSize}`
   let sql = `select * from projectinfo ${subSQL1+subSQL2+subSQL3}`
   let sqlArr = [];
-  let callBack =  (data) => {
+  let callBack = (data) => {
     console.log(sql)
     // console.log(data)
     let result = {
@@ -69,9 +69,9 @@ router.get('/filter', function (req, res, next) {
       list: []
     }
     if (data.length > 0) {
-      let end = (nowPage)*pageSize > data.length ? data.length:(nowPage)*pageSize
-      result.list = data.slice([(nowPage-1)*pageSize], end);
-      console.log((nowPage-1)*pageSize, end)
+      let end = (nowPage) * pageSize > data.length ? data.length : (nowPage) * pageSize
+      result.list = data.slice([(nowPage - 1) * pageSize], end);
+      console.log((nowPage - 1) * pageSize, end)
       result.list.forEach((item) => {
         projectList.phaseList.forEach((phase) => {
           if (phase.id == item['phase']) {
@@ -124,27 +124,33 @@ router.get('/keywords', function (req, res, next) {
 router.get('/projectOwn', function (req, res, next) {
   let userId = req.query.userId
   console.log(req.query)
-  let sql = `select id, name, phase, field, financing from projectinfo where userId=${userId}`;
-  let sqlArr = [];
-  let callBack = (data) => {
-    console.log(data);
-    if (data.length > 0) {
-      data.forEach((item) => {
-        projectList.phaseList.forEach((phase) => {
-          if (phase.id == item['phase']) {
-            item['phase'] = phase.name;
-          }
+  if (userId) {
+    let sql = `select id, name, phase, field, financing from projectinfo where userId=${userId}`;
+    let sqlArr = [];
+    let callBack = (data) => {
+      console.log(data);
+      if (data.length > 0) {
+        data.forEach((item) => {
+          projectList.phaseList.forEach((phase) => {
+            if (phase.id == item['phase']) {
+              item['phase'] = phase.name;
+            }
+          })
+          projectList.fieldList.forEach((field) => {
+            if (field.id == item['field']) {
+              item['field'] = field.name;
+            }
+          })
         })
-        projectList.fieldList.forEach((field) => {
-          if (field.id == item['field']) {
-            item['field'] = field.name;
-          }
-        })
-      })
+      }
+      res.send(data)
     }
-    res.send(data)
+    dbconfig.query(sql, sqlArr, callBack);
+  } else {
+    res.send(JSON.stringify({
+      error: 'no id'
+    }))
   }
-  dbconfig.query(sql, sqlArr, callBack);
 })
 
 
@@ -152,40 +158,46 @@ router.get('/projectOwn', function (req, res, next) {
 router.get('/projectDetail', function (req, res, next) {
   let projectId = req.query.projectId;
   console.log(req.query)
-  let sql = `select * from projectinfo where id=${projectId}`;
-  let sqlArr = [];
-  let callBack = (data) => {
-    console.log(data)
-    // 不存在该项目
-    if (data.length == 0) {
-      res.send(data)
-      return
+  if (projectId) {
+    let sql = `select * from projectinfo where id=${projectId}`;
+    let sqlArr = [];
+    let callBack = (data) => {
+      console.log(data)
+      // 不存在该项目
+      if (data.length == 0) {
+        res.send(data)
+        return
+      }
+      data[0]['time'] = data[0]['p_time']
+      // 处理项目阶段、项目领域
+      projectList.phaseList.forEach((item) => {
+        if (item.id == data[0]['phase']) {
+          data[0]['phase'] = item.name;
+        }
+      })
+      projectList.fieldList.forEach((item) => {
+        if (item.id == data[0]['field']) {
+          data[0]['field'] = item.name;
+        }
+      })
+      console.log(data[0]);
+      // 查找用户联系方式
+      let sqlUser = `select name,tel,email from userInfo where id=${data[0]['userId']}`;
+      let sqlArrUser = [];
+      let callBackUser = (userInfo) => {
+        if (userInfo.length > 0) {
+          data.push(userInfo[0])
+        }
+        res.send(data)
+      }
+      dbconfig.query(sqlUser, sqlArrUser, callBackUser);
     }
-    data[0]['time'] = data[0]['p_time']
-    // 处理项目阶段、项目领域
-    projectList.phaseList.forEach((item) => {
-      if (item.id == data[0]['phase']) {
-        data[0]['phase'] = item.name;
-      }
-    })
-    projectList.fieldList.forEach((item) => {
-      if (item.id == data[0]['field']) {
-        data[0]['field'] = item.name;
-      }
-    })
-    console.log(data[0]);
-    // 查找用户联系方式
-    let sqlUser = `select name,tel,email from userInfo where id=${data[0]['userId']}`;
-    let sqlArrUser = [];
-    let callBackUser = (userInfo) => {
-      if (userInfo.length > 0) {
-        data.push(userInfo[0])
-      }
-      res.send(data)
-    }
-    dbconfig.query(sqlUser, sqlArrUser, callBackUser);
+    dbconfig.query(sql, sqlArr, callBack);
+  } else {
+    res.send(JSON.stringify({
+      error: 'no id'
+    }))
   }
-  dbconfig.query(sql, sqlArr, callBack);
 });
 
 
@@ -212,7 +224,7 @@ router.post('/createProject', function (req, res, next) {
     }
     if (data.affectedRows === 1) {
       resData.success = true
-      resData.id =  data.insertId
+      resData.id = data.insertId
     }
     res.send(JSON.stringify(resData))
   }
@@ -251,18 +263,24 @@ router.post('/updateProject', function (req, res, next) {
 router.get('/delProject', function (req, res, next) {
   let projectId = req.query.projectId
   console.log(req.query)
-  let sql = `delete from projectinfo where id=${projectId}`;
-  let sqlArr = [];
-  let callBack = (data) => {
-    let resData = {
-      success: false
+  if (projectId) {
+    let sql = `delete from projectinfo where id=${projectId}`;
+    let sqlArr = [];
+    let callBack = (data) => {
+      let resData = {
+        success: false
+      }
+      if (data.affectedRows === 1) {
+        resData.success = true
+      }
+      res.send(JSON.stringify(resData))
     }
-    if (data.affectedRows === 1) {
-      resData.success = true
-    }
-    res.send(JSON.stringify(resData))
+    dbconfig.query(sql, sqlArr, callBack);
+  } else {
+    res.send(JSON.stringify({
+      error: 'no id'
+    }))
   }
-  dbconfig.query(sql, sqlArr, callBack);
 });
 
 // 图片存储配置

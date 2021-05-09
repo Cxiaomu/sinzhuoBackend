@@ -20,7 +20,7 @@ router.get('/filter', function (req, res) {
 });
 
 // 课程总数
-router.get('/courseTotal', function(req, res, next) {
+router.get('/courseTotal', function (req, res, next) {
   let sql = "select * from courseinfo";
   let sqlArr = [];
   let callBack = (data) => {
@@ -38,18 +38,22 @@ router.get('/courseTotal', function(req, res, next) {
 router.get('/courseOwn', function (req, res, next) {
   let userId = req.query.userId
   console.log(req.query)
-  let sql = `select id, name, author,unit,link,c_time from courseinfo where userId=${userId}`;
-  let sqlArr = [];
-  let callBack = (data) => {
-    // console.log(data);
-    if (data.length > 0) {
-      data.forEach((item) => {
-        item['time'] = item['c_time']
-      })
+  if (userId) {
+    let sql = `select id, name, author,unit,link,c_time from courseinfo where userId=${userId}`;
+    let sqlArr = [];
+    let callBack = (data) => {
+      // console.log(data);
+      if (data.length > 0) {
+        data.forEach((item) => {
+          item['time'] = item['c_time']
+        })
+      }
+      res.send(data)
     }
-    res.send(data)
+    dbconfig.query(sql, sqlArr, callBack);
+  } else {
+    res.send(JSON.stringify({ error: 'no id'}))
   }
-  dbconfig.query(sql, sqlArr, callBack);
 })
 
 
@@ -58,30 +62,34 @@ router.get('/courseOwn', function (req, res, next) {
 router.get('/courseDetail', function (req, res, next) {
   let courseId = req.query.courseId;
   console.log(req.query)
-  let sql = `select * from courseinfo where id=${courseId}`;
-  let sqlArr = [];
-  let callBack = (data) => {
-    console.log(data)
-    // 不存在该课程
-    if (data.length == 0) {
-      res.send(data)
-      return
-    }
-    // 处理数据字段
-    data[0]['time'] = data[0]['c_time']
-    
-    // 查找用户名字
-    let sqlUser = `select name from userInfo where id=${data[0]['userId']}`;
-    let sqlArrUser = [];
-    let callBackUser = (userInfo) => {
-      if (userInfo.length > 0) {
-        data[0]['publisher'] = userInfo[0]['name']
+  if (courseId) {
+    let sql = `select * from courseinfo where id=${courseId}`;
+    let sqlArr = [];
+    let callBack = (data) => {
+      console.log(data)
+      // 不存在该课程
+      if (data.length == 0) {
+        res.send(data)
+        return
       }
-      res.send(data)
+      // 处理数据字段
+      data[0]['time'] = data[0]['c_time']
+
+      // 查找用户名字
+      let sqlUser = `select name from userInfo where id=${data[0]['userId']}`;
+      let sqlArrUser = [];
+      let callBackUser = (userInfo) => {
+        if (userInfo.length > 0) {
+          data[0]['publisher'] = userInfo[0]['name']
+        }
+        res.send(data)
+      }
+      dbconfig.query(sqlUser, sqlArrUser, callBackUser);
     }
-    dbconfig.query(sqlUser, sqlArrUser, callBackUser);
+    dbconfig.query(sql, sqlArr, callBack);
+  } else {
+    res.send(JSON.stringify({ error: 'no id'}))
   }
-  dbconfig.query(sql, sqlArr, callBack);
 });
 
 // 新建课程
@@ -100,11 +108,14 @@ router.post('/createCourse', function (req, res, next) {
   let sqlArr = [];
   let callBack = (data) => {
     console.log(data);
-    let resData = { success: false, id: 0 }
+    let resData = {
+      success: false,
+      id: 0
+    }
     if (data.affectedRows === 1) {
       resData.success = true
-      resData.id =  data.insertId
-    } 
+      resData.id = data.insertId
+    }
     res.send(JSON.stringify(resData))
   }
   dbconfig.query(sql, sqlArr, callBack);
@@ -124,10 +135,12 @@ router.post('/updateCourse', function (req, res, next) {
   where userId=${userId} AND id=${courseId}`;
   let sqlArr = [];
   let callBack = (data) => {
-    let resData = { success: false }
+    let resData = {
+      success: false
+    }
     if (data.affectedRows === 1) {
       resData.success = true
-    } 
+    }
     res.send(JSON.stringify(resData))
   }
   dbconfig.query(sql, sqlArr, callBack);
@@ -138,16 +151,22 @@ router.post('/updateCourse', function (req, res, next) {
 router.get('/delCourse', function (req, res, next) {
   let courseId = req.query.courseId
   console.log(req.query)
-  let sql = `delete from courseinfo where id=${courseId}`;
-  let sqlArr = [];
-  let callBack = (data) => {
-    let resData = { success: false }
-    if (data.affectedRows === 1) {
-      resData.success = true
-    } 
-    res.send(JSON.stringify(resData))
+  if (courseId) {
+    let sql = `delete from courseinfo where id=${courseId}`;
+    let sqlArr = [];
+    let callBack = (data) => {
+      let resData = {
+        success: false
+      }
+      if (data.affectedRows === 1) {
+        resData.success = true
+      }
+      res.send(JSON.stringify(resData))
+    }
+    dbconfig.query(sql, sqlArr, callBack);
+  } else {
+    res.send(JSON.stringify({ error: 'no id'}))
   }
-  dbconfig.query(sql, sqlArr, callBack);
 });
 
 

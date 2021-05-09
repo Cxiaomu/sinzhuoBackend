@@ -42,19 +42,25 @@ router.get('/postTotal', function (req, res) {
 router.get('/postOwn', function (req, res, next) {
   let userId = req.query.userId
   console.log(req.query)
-  let sql = `select * from postinfo where userId=${userId}`;
-  let sqlArr = [];
-  let callBack = (data) => {
-    console.log(data);
-    if (data.length > 0) {
-      data.forEach((item) => {
-        item['price'] = [item['price_low'], item['price_high']]
-        item['need'] = [item['need_low'], item['need_high']]
-      })
+  if (userId) {
+    let sql = `select * from postinfo where userId=${userId}`;
+    let sqlArr = [];
+    let callBack = (data) => {
+      console.log(data);
+      if (data.length > 0) {
+        data.forEach((item) => {
+          item['price'] = [item['price_low'], item['price_high']]
+          item['need'] = [item['need_low'], item['need_high']]
+        })
+      }
+      res.send(data)
     }
-    res.send(data)
+    dbconfig.query(sql, sqlArr, callBack);
+  } else {
+    res.send(JSON.stringify({
+      error: 'no id'
+    }))
   }
-  dbconfig.query(sql, sqlArr, callBack);
 })
 
 
@@ -62,33 +68,39 @@ router.get('/postOwn', function (req, res, next) {
 router.get('/postDetail', function (req, res, next) {
   let postId = req.query.postId;
   console.log(req.query)
-  let sql = `select * from postinfo where id=${postId}`;
-  let sqlArr = [];
-  let callBack = (data) => {
-    console.log(data)
-    // 不存在该岗位
-    if (data.length == 0) {
-      res.send(data)
-      return
-    }
-    console.log(data[0]);
-    // 处理数据字段
-    data[0]['time'] = data[0]['p_time']
-    data[0]['price'] = [data[0]['price_low'], data[0]['price_high']]
-    data[0]['need'] = [data[0]['need_low'], data[0]['need_high']]
-    data[0]['require'] = data[0]['must']
-    // 查找用户联系方式
-    let sqlUser = `select name,tel,email from userInfo where id=${data[0]['userId']}`;
-    let sqlArrUser = [];
-    let callBackUser = (userInfo) => {
-      if (userInfo.length > 0) {
-        data.push(userInfo[0])
+  if (postId) {
+    let sql = `select * from postinfo where id=${postId}`;
+    let sqlArr = [];
+    let callBack = (data) => {
+      console.log(data)
+      // 不存在该岗位
+      if (data.length == 0) {
+        res.send(data)
+        return
       }
-      res.send(data)
+      console.log(data[0]);
+      // 处理数据字段
+      data[0]['time'] = data[0]['p_time']
+      data[0]['price'] = [data[0]['price_low'], data[0]['price_high']]
+      data[0]['need'] = [data[0]['need_low'], data[0]['need_high']]
+      data[0]['require'] = data[0]['must']
+      // 查找用户联系方式
+      let sqlUser = `select name,tel,email from userInfo where id=${data[0]['userId']}`;
+      let sqlArrUser = [];
+      let callBackUser = (userInfo) => {
+        if (userInfo.length > 0) {
+          data.push(userInfo[0])
+        }
+        res.send(data)
+      }
+      dbconfig.query(sqlUser, sqlArrUser, callBackUser);
     }
-    dbconfig.query(sqlUser, sqlArrUser, callBackUser);
+    dbconfig.query(sql, sqlArr, callBack);
+  } else {
+    res.send(JSON.stringify({
+      error: 'no id'
+    }))
   }
-  dbconfig.query(sql, sqlArr, callBack);
 });
 
 // 新建岗位
@@ -163,19 +175,25 @@ router.post('/updatePost', function (req, res, next) {
 router.get('/delPost', function (req, res, next) {
   let postId = req.query.postId
   console.log(req.query)
-  let sql = `delete from postinfo where id=${postId}`;
-  let sqlArr = [];
-  let callBack = (data) => {
-    console.log(data);
-    let resData = {
-      success: false
+  if (postId) {
+    let sql = `delete from postinfo where id=${postId}`;
+    let sqlArr = [];
+    let callBack = (data) => {
+      console.log(data);
+      let resData = {
+        success: false
+      }
+      if (data.affectedRows === 1) {
+        resData.success = true
+      }
+      res.send(JSON.stringify(resData))
     }
-    if (data.affectedRows === 1) {
-      resData.success = true
-    }
-    res.send(JSON.stringify(resData))
+    dbconfig.query(sql, sqlArr, callBack);
+  } else {
+    res.send(JSON.stringify({
+      error: 'no id'
+    }))
   }
-  dbconfig.query(sql, sqlArr, callBack);
 });
 
 
