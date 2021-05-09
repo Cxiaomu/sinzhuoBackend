@@ -31,13 +31,6 @@
   ],
   "nav": [
     {
-      "id": "1",
-      "name": "我的消息",
-      "icon": "iconxiaoxi",
-      "path": "/myNews",
-      "type": [0]
-    },
-    {
       "id": "2",
       "name": "我的项目",
       "icon": "iconxiangmuguanli",
@@ -57,20 +50,6 @@
       "icon": "iconzhaopingangwei",
       "path": "/myPost",
       "type": [1, 2]
-    },
-    {
-      "id": "5",
-      "name": "我的企业",
-      "icon": "iconqiye",
-      "path": "/myFirm",
-      "type": [1]
-    },
-    {
-      "id": "6",
-      "name": "我的关注",
-      "icon": "iconchakantieziguanzhu",
-      "path": "/myFocus",
-      "type": [0]
     },
     {
       "id": "7",
