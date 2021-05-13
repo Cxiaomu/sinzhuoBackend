@@ -1,6 +1,5 @@
 {
-  "menu": [
-    {
+  "menu": [{
       "id": "1",
       "name": "首页",
       "icon": "iconshouye",
@@ -29,8 +28,7 @@
 
     }
   ],
-  "nav": [
-    {
+  "nav": [{
       "id": "2",
       "name": "我的项目",
       "icon": "iconxiangmuguanli",
