@@ -52,7 +52,9 @@ router.get('/courseOwn', function (req, res, next) {
     }
     dbconfig.query(sql, sqlArr, callBack);
   } else {
-    res.send(JSON.stringify({ error: 'no id'}))
+    res.send(JSON.stringify({
+      error: 'no id'
+    }))
   }
 })
 
@@ -88,7 +90,9 @@ router.get('/courseDetail', function (req, res, next) {
     }
     dbconfig.query(sql, sqlArr, callBack);
   } else {
-    res.send(JSON.stringify({ error: 'no id'}))
+    res.send(JSON.stringify({
+      error: 'no id'
+    }))
   }
 });
 
@@ -165,7 +169,9 @@ router.get('/delCourse', function (req, res, next) {
     }
     dbconfig.query(sql, sqlArr, callBack);
   } else {
-    res.send(JSON.stringify({ error: 'no id'}))
+    res.send(JSON.stringify({
+      error: 'no id'
+    }))
   }
 });
 

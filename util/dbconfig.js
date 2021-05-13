@@ -28,7 +28,7 @@ module.exports = {
           console.log('数据库操作失败');
           throw err;
         }
-        
+
         // 执行回调函数
         // console.log(data)
         // console.log(fields)

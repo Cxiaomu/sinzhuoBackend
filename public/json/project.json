@@ -1,6 +1,5 @@
 {
-    "phaseList": [
-        {
+    "phaseList": [{
             "id": "0",
             "name": "全部",
             "type": "0"
@@ -31,8 +30,7 @@
             "type": "5"
         }
     ],
-    "fieldList": [
-        {
+    "fieldList": [{
             "id": "0",
             "name": "全部",
             "type": "0"
