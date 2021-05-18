@@ -38,7 +38,7 @@ router.post('/register', function (req, res, next) {
 
   // 判断是否存在该用户
   let exist = false;
-  let sqlCheck = `select * from userInfo where username='${tel}'`;
+  let sqlCheck = `select * from userInfo where tel='${tel}'`;
   let sqlArrCheck = [];
   let callBackCheck = (data) => {
     console.log(data.length, "data.length")
