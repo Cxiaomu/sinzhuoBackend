@@ -38,6 +38,27 @@ router.get('/postTotal', function (req, res) {
   dbconfig.query(sql, sqlArr, callBack);
 })
 
+// 根据关键字搜索
+router.get('/keywords', function (req, res, next) {
+  let keywords = req.query.keywords
+  console.log(req.query)
+  let sql = `select * from postinfo where (name LIKE '%${keywords}%' or unit LIKE '%${keywords}%' 
+  or address LIKE '%${keywords}%')`;
+  let sqlArr = [];
+  let callBack = (data) => {
+    console.log(data);
+    console.log(sql)
+    if (data.length > 0) {
+      data.forEach((item) => {
+        item['price'] = [item['price_low'], item['price_high']]
+        item['need'] = [item['need_low'], item['need_high']]
+      })
+    }
+    res.send(JSON.stringify(data))
+  }
+  dbconfig.query(sql, sqlArr, callBack);
+})
+
 // 获取我的岗位
 router.get('/postOwn', function (req, res, next) {
   let userId = req.query.userId

@@ -34,6 +34,21 @@ router.get('/courseTotal', function (req, res, next) {
 });
 
 
+// 根据关键字搜索
+router.get('/keywords', function (req, res, next) {
+  let keywords = req.query.keywords
+  console.log(req.query)
+  let sql = `select * from courseinfo where (name LIKE '%${keywords}%' or abstract LIKE '%${keywords}%' 
+  or author LIKE '%${keywords}%' or unit LIKE '%${keywords}%')`;
+  let sqlArr = [];
+  let callBack = (data) => {
+    console.log(data);
+    console.log(sql)
+    res.send(JSON.stringify(data))
+  }
+  dbconfig.query(sql, sqlArr, callBack);
+})
+
 // 获取我的课程
 router.get('/courseOwn', function (req, res, next) {
   let userId = req.query.userId
@@ -52,7 +67,9 @@ router.get('/courseOwn', function (req, res, next) {
     }
     dbconfig.query(sql, sqlArr, callBack);
   } else {
-    res.send(JSON.stringify({ error: 'no id'}))
+    res.send(JSON.stringify({
+      error: 'no id'
+    }))
   }
 })
 
@@ -88,7 +105,9 @@ router.get('/courseDetail', function (req, res, next) {
     }
     dbconfig.query(sql, sqlArr, callBack);
   } else {
-    res.send(JSON.stringify({ error: 'no id'}))
+    res.send(JSON.stringify({
+      error: 'no id'
+    }))
   }
 });
 
@@ -165,7 +184,9 @@ router.get('/delCourse', function (req, res, next) {
     }
     dbconfig.query(sql, sqlArr, callBack);
   } else {
-    res.send(JSON.stringify({ error: 'no id'}))
+    res.send(JSON.stringify({
+      error: 'no id'
+    }))
   }
 });
 
