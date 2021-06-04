@@ -11,7 +11,7 @@ router.get('/login', function (req, res, next) {
     password
   } = req.query
   console.log(req.query)
-  let sql = `select * from userInfo where tel='${username}' AND password='${password}' AND role=${role}`;
+  let sql = `select * from userInfo where username='${username}' AND password='${password}' AND role=${role}`;
   let sqlArr = [];
   let callBack = (data) => {
     console.log(data);
